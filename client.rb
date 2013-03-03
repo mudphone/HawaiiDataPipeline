@@ -10,9 +10,8 @@ module HGovData
       @config.merge(opts)
     end
 
-    def get(url)
-      # assumes json, http (not https)
-
+    # assumes json, http (not https)
+    def get! url
       # Create our request
       uri = URI.parse(url)
       http = Net::HTTP.new(uri.host, uri.port)
@@ -31,6 +30,17 @@ module HGovData
         # return Hashie::Mash.new(response.body)
         return JSON.parse(response.body)
       end
+    end
+
+    def get url
+      @expensive_get ||= {}
+      @expensive_get[url] ||= get!(url)
+    end
+
+    def clear_cache
+      items = @expensive_get.size
+      @expensive_get = {}
+      puts "Cache of #{items} item#{items == 1 ? '' : 's'} cleared."
     end
 
     # client.views                 # returns all views, all columns
@@ -75,7 +85,7 @@ module HGovData
       nil
     end
 
-    def data(id)
+    def data_for id
       get "http://data.honolulu.gov/resource/#{id}.json"
     end
 
