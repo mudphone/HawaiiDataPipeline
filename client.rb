@@ -33,15 +33,48 @@ module HGovData
       end
     end
 
-    def views
-      get "http://data.honolulu.gov/api/views"
+    # client.views                 # returns all views, all columns
+    # client.views(limit: 2)       # limits returned dataset to 2
+    # client.views(cols: [:name])  # returns only the "name" kv pair, for all views
+    # client.views(limit: 3, cols: [:id, :name])  # returns the "id" and "name" kv pairs, 
+                                                  #   limiting to three views
+    def views(opts={})
+      limit = opts[:limit]
+      cols = opts[:cols] || []
+
+      url = "http://data.honolulu.gov/api/views"
+      url += "?limit=#{limit}" if limit
+      all_views = get url
+      
+      return all_views if cols.empty?
+
+      column_names = cols.map{ |c| c.to_s }
+      all_views.map do |v| 
+        v.reject! { |k, v| !column_names.include?(k) }
+      end
+      return all_views
+    end
+
+    # 
+    def views_sorted_by sort_thing
+      views.sort_by{ |v| v[sort_thing.to_s] }
+    end
+
+    def view_keys
+      sample = views(limit: 1)
+      return nil if sample.empty?
+      sample.first.keys.map { |k| k.to_sym }
     end
 
     def list
-      views.sort_by{ |v| v['name'] }.each do |n|
+      views_sorted_by('name').each do |n|
         puts "#{n['name']}"
       end
       nil
+    end
+
+    def data(id)
+      get "http://data.honolulu.gov/resource/#{id}.json"
     end
 
   end
