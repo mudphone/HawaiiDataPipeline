@@ -55,17 +55,19 @@ module HGovData
       return all_views
     end
 
-    # 
+    # Sorted by a key
     def views_sorted_by sort_thing
       views.sort_by{ |v| v[sort_thing.to_s] }
     end
 
+    # All keys in a view
     def view_keys
       sample = views(limit: 1)
       return nil if sample.empty?
       sample.first.keys.map { |k| k.to_sym }
     end
 
+    # List of all dataset view names
     def list
       views_sorted_by('name').each do |n|
         puts "#{n['name']}"
