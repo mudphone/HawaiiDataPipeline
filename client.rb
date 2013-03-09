@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby -w
 require 'net/https'
 require 'json'
+require 'set'
 
 module HGovData
-  API_URL = "data.honolulu.gov"
+  API_URL = "data.hawaii.gov"
   
   class Client
 
@@ -12,25 +13,36 @@ module HGovData
       @config.merge(opts)
     end
 
-    # assumes json, http (not https)
-    def get! url
+    def response_for! url
       # Create our request
+      use_ssl = url.start_with? "https://"
       uri = URI.parse(url)
       http = Net::HTTP.new(uri.host, uri.port)
-      # http.use_ssl = true
+      http.use_ssl = use_ssl
+      if use_ssl
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
 
       request = Net::HTTP::Get.new(uri.request_uri)
       request.add_field("X-App-Token", @config[:app_token])
-      
-      # BAM!
-      response = http.request(request)
+      response = http.request request
+      { body: response.body,
+        code: response.code }
+    end
 
+    def response_for url
+      @expensive_request ||= {}
+      @expensive_request[url] ||= response_for!(url)
+    end
+    
+    # assumes json, http (not https)
+    def get! url
+      response = response_for! url
       # Check our response code
-      if response.code != "200"
+      if response[:code] != "200"
         raise "Error querying \"#{uri.to_s}\": #{response.body}"
       else
-        # return Hashie::Mash.new(response.body)
-        return JSON.parse(response.body)
+        return response[:body]
       end
     end
 
@@ -39,10 +51,23 @@ module HGovData
       @expensive_get[url] ||= get!(url)
     end
 
-    def clear_cache
-      items = @expensive_get.size
+    def get_json url
+      return JSON.parse(get(url))
+    end
+
+    def clear_cache!
+      get_size = @expensive_get ? @expensive_get.size : 0
       @expensive_get = {}
-      puts "Cache of #{items} item#{items == 1 ? '' : 's'} cleared."
+      puts "Cache of #{get_size} URL#{get_size == 1 ? '' : 's'} cleared."
+
+      request_size = @expensive_request ? @expensive_request.size : 0
+      @expensive_request = {}
+      puts "Cache of #{request_size} request#{request_size == 1 ? '' : 's'} cleared."
+      
+      dataset_size = @dataset_links ? @dataset_links.size : 0
+      @dataset_links = nil
+      puts "Cache of #{dataset_size} dataset name#{dataset_size == 1 ? '' : 's'} cleared."
+      
     end
 
     # client.views                 # returns all views, all columns
@@ -56,7 +81,7 @@ module HGovData
 
       url = "http://#{API_URL}/api/views"
       url += "?limit=#{limit}" if limit
-      all_views = get url
+      all_views = get_json url
       
       return all_views if cols.empty?
 
@@ -80,7 +105,7 @@ module HGovData
     end
 
     # List of all dataset view names
-    def list
+    def list_views
       views_sorted_by('name').each do |n|
         puts "#{n['name']}"
       end
@@ -88,8 +113,38 @@ module HGovData
     end
 
     def data_for id
-      get "http://#{API_URL}/resource/#{id}.json"
+      get_json "http://#{API_URL}/resource/#{id}.json"
     end
 
+    def datasets
+      return @dataset_links unless @dataset_links.nil?
+      
+      links = Set.new
+      1.upto(100) do |n|
+        puts "Looking for datasets on page #: #{n}"
+        url = "https://#{API_URL}/browse/embed?limitTo=datasets&page=#{n}"
+        puts "url is: #{url}"
+        response = response_for url
+        break if response[:code] != "200"
+        body = response[:body]
+        new_links = body.scan(/href="(?:http:\/\/.*?)?(\/[^\/]*?\/[^\/]*?)\/(.{4,4}-.{4,4})"/)
+        break if new_links.empty?
+        links.merge Set.new(new_links)
+        puts "... #{links.size} unique datasets found... (still searching)"
+      end
+      puts "Search complete, found #{links.size} datasets."
+      @dataset_links = links
+    end
+
+    def list_datasets
+      sorted_datasets.each_with_index do |d, idx|
+        puts "#{idx}) Name: #{d.first}  ID: #{d[1]}"
+      end
+      nil
+    end
+
+    def sorted_datasets
+      datasets.to_a.sort_by { |ds| ds.first }
+    end
   end
 end

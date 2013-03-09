@@ -2,9 +2,17 @@ $ irb
 $ load 'client.rb' # will reload if already loaded, which is good for debugging
 $ c = HGovData::Client.new(app_token: "YOUR_CLIENT_TOKEN")
 $ v = c.views
-$ c.list  # list all datasets (names of all views)
+$ c.list_views  # list all datasets (names of all views)
 $ d = c.data_for v[0]['id']
 
 
+Current dataset listing (as of 2013/3/8):
+https://gist.github.com/mudphone/5123035
+
 
 # $:.unshift File.dirname(__FILE__)
+
+
+$stdout = File.new( '/tmp/output', 'w' )
+To restore:
+$stdout = STDOUT
