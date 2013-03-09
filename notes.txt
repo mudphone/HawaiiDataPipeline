@@ -1,0 +1,10 @@
+$ irb
+$ load 'client.rb' # will reload if already loaded, which is good for debugging
+$ c = HGovData::Client.new(app_token: "YOUR_CLIENT_TOKEN")
+$ v = c.views
+$ c.list  # list all datasets (names of all views)
+$ d = c.data_for v[0]['id']
+
+
+
+# $:.unshift File.dirname(__FILE__)
