@@ -3,6 +3,8 @@ require 'net/https'
 require 'json'
 
 module HGovData
+  API_URL = "data.honolulu.gov"
+  
   class Client
 
     def initialize(opts = {:app_token => "K6rLY8NBK0Hgm8QQybFmwIUQw"})
@@ -52,7 +54,7 @@ module HGovData
       limit = opts[:limit]
       cols = opts[:cols] || []
 
-      url = "http://data.honolulu.gov/api/views"
+      url = "http://#{API_URL}/api/views"
       url += "?limit=#{limit}" if limit
       all_views = get url
       
@@ -86,7 +88,7 @@ module HGovData
     end
 
     def data_for id
-      get "http://data.honolulu.gov/resource/#{id}.json"
+      get "http://#{API_URL}/resource/#{id}.json"
     end
 
   end
