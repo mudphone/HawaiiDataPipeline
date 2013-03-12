@@ -1,0 +1,10 @@
+development: &non_production_settings
+  :socrata:
+    :api_key: "[Enter Socrata ID]"
+
+test:
+  <<: *non_production_settings
+
+production:
+  :socrata:
+    :api_key: "[Enter Socrata ID]"
