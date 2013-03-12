@@ -1,10 +1,10 @@
 development: &non_production_settings
   :socrata:
-    :api_key: "[Enter Socrata ID]"
+    :app_token: "[Enter Socrata ID]"
 
 test:
   <<: *non_production_settings
 
 production:
   :socrata:
-    :api_key: "[Enter Socrata ID]"
+    :app_token: "[Enter Socrata ID]"

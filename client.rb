@@ -5,12 +5,27 @@ require 'set'
 
 module HGovData
   API_URL = "data.hawaii.gov"
+  CLIENT_ENV = "development"
+  APP_ROOT = File.expand_path(File.dirname(__FILE__))
+  CACHE_MINUTES = 60
+  CACHE_ROOT = APP_ROOT + "/tmp/cache"
+  CONFIG_ROOT = APP_ROOT + "/config"
   
   class Client
 
-    def initialize(opts = {:app_token => "K6rLY8NBK0Hgm8QQybFmwIUQw"})
+    class << self
+      def slurp_config
+        raw_config = File.read "#{CONFIG_ROOT}/config.yml"
+        YAML.load(raw_config)[CLIENT_ENV]
+      end
+    end
+    
+    def initialize(opts={})
+      @user_config = self.class.slurp_config || {}
       @config = {}
-      @config.merge(opts)
+      @config[:app_token] = opts[:app_token]
+      @config[:app_token] ||= @user_config[:socrata] ? @user_config[:socrata][:app_token] : nil
+      @config[:app_token] ||= "K6rLY8NBK0Hgm8QQybFmwIUQw"
     end
 
     def response_for! url
@@ -24,15 +39,44 @@ module HGovData
       end
 
       request = Net::HTTP::Get.new(uri.request_uri)
+      puts "using app_token: #{@config[:app_token]}"
       request.add_field("X-App-Token", @config[:app_token])
       response = http.request request
       { body: response.body,
         code: response.code }
     end
 
+    def cache_name_for url
+      url.gsub(/http[s]?:\/\//, "")
+        .gsub(/[;,\/]/, "_")
+    end
+    
     def response_for url
-      @expensive_request ||= {}
-      @expensive_request[url] ||= response_for!(url)
+      name = cache_name_for url
+      read_fragment(name) || write_fragment(name, response_for!(url))
+    end
+    
+    def read_fragment name
+      cache_file = "#{CACHE_ROOT}/#{name}.cache"
+      now = Time.now
+      if File.file?(cache_file)
+        if CACHE_MINUTES > 0
+          (current_age = (now - File.mtime(cache_file)).to_i / 60)
+          puts "Fragment for '#{name}' is #{current_age} minutes old."
+          return false if (current_age > CACHE_MINUTES)
+        end
+        return File.read(cache_file)
+      end
+      false
+    end
+    
+    def write_fragment name, buf
+      cache_file = "#{CACHE_ROOT}/#{name}.cache"
+      f = File.new(cache_file, "w+")
+      f.write(buf)
+      f.close
+      puts "Fragment written for '#{name}'"
+      buf
     end
     
     # assumes json, http (not https)
@@ -60,10 +104,6 @@ module HGovData
       @expensive_get = {}
       puts "Cache of #{get_size} URL#{get_size == 1 ? '' : 's'} cleared."
 
-      request_size = @expensive_request ? @expensive_request.size : 0
-      @expensive_request = {}
-      puts "Cache of #{request_size} request#{request_size == 1 ? '' : 's'} cleared."
-      
       dataset_size = @dataset_links ? @dataset_links.size : 0
       @dataset_links = nil
       puts "Cache of #{dataset_size} dataset name#{dataset_size == 1 ? '' : 's'} cleared."
