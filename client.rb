@@ -72,6 +72,7 @@ module HGovData
     
     def write_fragment name, buf
       cache_file = "#{CACHE_ROOT}/#{name}.cache"
+      cache_file += ".json" if name.end_with? ".json"
       f = File.new(cache_file, "w+")
       f.write(buf)
       f.close
@@ -82,17 +83,19 @@ module HGovData
     # assumes json, http (not https)
     def get! url
       response = response_for! url
+      puts "response:"
+      puts response
       # Check our response code
-      if response[:code] != "200"
-        raise "Error querying \"#{uri.to_s}\": #{response.body}"
+      if response && response[:code] != "200"
+        raise "Error querying \"#{url.to_s}\": #{response[:body]}"
       else
         return response[:body]
       end
     end
 
     def get url
-      @expensive_get ||= {}
-      @expensive_get[url] ||= get!(url)
+      name = cache_name_for url
+      read_fragment(name) || write_fragment(name, get!(url))
     end
 
     def get_json url
@@ -100,14 +103,9 @@ module HGovData
     end
 
     def clear_cache!
-      get_size = @expensive_get ? @expensive_get.size : 0
-      @expensive_get = {}
-      puts "Cache of #{get_size} URL#{get_size == 1 ? '' : 's'} cleared."
-
       dataset_size = @dataset_links ? @dataset_links.size : 0
       @dataset_links = nil
       puts "Cache of #{dataset_size} dataset name#{dataset_size == 1 ? '' : 's'} cleared."
-      
     end
 
     # client.views                 # returns all views, all columns
