@@ -47,8 +47,11 @@ module HGovData
     end
 
     def cache_name_for url
-      url.gsub(/http[s]?:\/\//, "")
+      modified_url = url
+        .gsub(/http[s]?:\/\//, "")
         .gsub(/[;,\/]/, "_")
+      datetime_tag = DateTime.now.strftime("%Y%m%dT%H%M%S%z")
+      "#{datetime_tag}_#{modified_url}"
     end
     
     def response_for url
