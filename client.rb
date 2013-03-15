@@ -7,7 +7,7 @@ module HGovData
   API_URL = "data.hawaii.gov"
   CLIENT_ENV = "development"
   APP_ROOT = File.expand_path(File.dirname(__FILE__))
-  CACHE_MINUTES = 60
+  CACHE_MINUTES = 24 * 60
   CACHE_ROOT = APP_ROOT + "/tmp/cache"
   CONFIG_ROOT = APP_ROOT + "/config"
   
