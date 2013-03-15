@@ -16,3 +16,12 @@ https://gist.github.com/mudphone/5123035
 $stdout = File.new( '/tmp/output', 'w' )
 To restore:
 $stdout = STDOUT
+
+
+
+# let's look at the death and birth rates in Hawaii
+$ irb
+> load 'client.rb'
+> c = HGovData::Client.new
+> d_death = c.data_for "xa5e-sayp"
+> d_birth = c.data_for "padw-q7ep"
