@@ -40,7 +40,7 @@ var svg = d3.select("body").append("svg")
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("data/birth_padw-q7ep.json", function(error, data) {
+d3.json("data/death_xa5e-sayp.json", function(error, data) {
 
   var x_extent = d3.extent(data, function(d){ return parseInt(d.year); });
   var x = d3.scale.linear()
@@ -83,7 +83,7 @@ d3.json("data/birth_padw-q7ep.json", function(error, data) {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Birth Rate per 1000 Residents");
+      .text("Death Rate per 1000 Residents");
 });
 
 </script>
