@@ -74,11 +74,11 @@ d3.json("data/hawaii_topojson.json", function(error, hawaii) {
   // Align labels depending on what side of map they're on:
   var leftPointingCityLabels = ['Wahiawa', 'Kailua-Kona'];
   svg.selectAll(".place-label")
-    .attr("x", function(d) { 
+    .attr("x", function(d) {
       var offset = 6;
       return _.contains(leftPointingCityLabels, d.properties.name) ? -offset : offset;
     })
-    .style("text-anchor", function(d) { 
+    .style("text-anchor", function(d) {
       return _.contains(leftPointingCityLabels, d.properties.name) ? "end" : "start";
     });
 
