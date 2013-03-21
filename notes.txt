@@ -43,6 +43,12 @@ $ python -m SimpleHTTPServer 8008 &
 
 # MAPPING (MAC OSX INSTALL)
 Loosely based on this: http://bost.ocks.org/mike/map/
+
+http://www.naturalearthdata.com/downloads/
+- select large scale / cultural
+- download Admin 1 - States, Provinces: "Download states and provinces (shp)"
+- download Populated Places: "Download populated places"
+
 $ brew install gdal
 $ brew install node
 $ npm install -g topojson
@@ -80,3 +86,109 @@ $ ogr2ogr -f GeoJSON -where "iso_a2 = 'US' AND ADM1NAME = 'Hawaii'" places.json 
 
 $ topojson -p name=NAME -p name -o hawaii_topojson.json subunits.json places.json
 
+
+
+
+
+# Plot some points:
+75) Name: /Economic-Development/Hawaii-EV-Charging-Stations-02072013  ID: hbhw-unm4
+> d_ev_charging = c.data_for "hbhw-unm4"
+> d_ev_charging[0]["location_1"]
+ => {"needs_recoding"=>false, "longitude"=>"-155.99167523068476", "latitude"=>"19.827445243219415", "
+human_address"=>"{\"address\":\"72-100 Kaupulehu Dr.\",\"city\":\"Kailua-Kona\",\"state\":\"HI\",\"zi
+p\":\"96740\"}"}
+
+
+127) Name: /Employment/Hawaii-Directory-Of-Green-Employers  ID: mq86-5ta6
+d_green_employers = c.data_for "mq86-5ta6"
+> d_green_employers[0]
+ => {"county"=>"install electrical PV systems", "job_title"=>"Construction", "company_phone"=>"Dougla
+s Oki", "employer_name"=>"808- ELECTRIC AND TELECOM LLC", "primary_contact_name"=>"Generate Clean, Re
+newable, Sustainable Energy", "job_green_area"=>"Electrician (PV)", "job_description"=>"Building Equi
+pment Contractors", "industry"=>"808-966-7484", "location_1"=>{"needs_recoding"=>false, "longitude"=>
+"-155.0442574592578", "latitude"=>"19.637427491648623", "human_address"=>"{\"address\":\"16-206 Wilia
+ma Pl Unit B\",\"city\":\"Keaau\",\"state\":\"HI\",\"zip\":\"96749\"}"}, "primary_contact_phone"=>"Ha
+waii"}
+
+
+
+130) Name: /Employment/Top-50-Employers-Hawaii-County  ID: gphu-34y5
+131) Name: /Employment/Top-50-Employers-Honolulu-County  ID: jkm3-epq4
+132) Name: /Employment/Top-50-Employers-Maui-County  ID: 9i8q-bgfy
+1.9.3-p362 :042 > d_top_employers_hon[0]
+ => {"business_description"=>"Employment Agencies & Opportunities", "yr_estab"=>"1969", "private_govt
+"=>"Private", "contact_gender"=>"M", "contact_title"=>"Owner", "emp_size"=>"10000+", "unique_id"=>"71
+2316884", "last_update"=>"201205", "name"=>"Altres Medical", "naics_primary"=>"56131100", "contact_la
+st_name"=>"Guss", "landmark_address"=>{"needs_recoding"=>false, "longitude"=>"-157.84398000037658", "
+latitude"=>"21.296890000273436", "human_address"=>"{\"address\":\"The Altres Bldg\",\"city\":\"Honolu
+lu\",\"state\":\"HI\",\"zip\":\"96814\"}"}, "census_tract"=>"003700", "fax_number"=>"8085918420", "co
+ntact_first_name"=>"Barron", "web_url"=>{"url"=>"http://ALTRES.COM"}, "mailing_address"=>{"needs_reco
+ding"=>false, "longitude"=>"-157.86044000040556", "latitude"=>"21.30654000012106", "human_address"=>"
+{\"address\":\"PO Box 1410\",\"city\":\"Honolulu\",\"state\":\"HI\",\"zip\":\"96807\"}"}, "annual_sal
+es"=>"40000000", "physical_location"=>{"needs_recoding"=>false, "longitude"=>"-157.851813", "latitude
+"=>"21.297778", "human_address"=>"{\"address\":\"967 Kapiolani Blvd\",\"city\":\"Honolulu\",\"state\"
+:\"HI\",\"zip\":\"96814\"}"}, "census_block_grp"=>"2", "business_location_status"=>"single location f
+irm", "naics_2"=>"42399000", "naics_4"=>"99999000", "naics_3"=>"56131100", "release"=>"131", "telepho
+ne"=>"8085914900"}
+
+
+
+230) Name: /Health/OAHU-Food-Establishments  ID: qkvm-skze
+ONLY DOWNLOADED FIRST 1000!!!
+"st_inspection"=>"2010-09-14T00:00:00"
+"permit_expire_date"=>"2012-09-29T00:00:00"
+"establishment"=>"L & L DRIVE INN #11"
+> d_oahu_food = c.data_for "qkvm-skze"
+> d_oahu_food[0]["mailing_address_street"]
+ => {"needs_recoding"=>false, "longitude"=>"-157.81032287478018", "latitude"=>"21.30718330212897", "h
+uman_address"=>"{\"address\":\"WOODLAWN DRIVE\",\"city\":\"HONOLULU\",\"state\":\"HAWAII\",\"zip\":\"
+96822\"}"}
+
+> d_oahu_food[999]
+ => {"establishment_address_unit"=>"   ", "tmkzone"=>"6", "facility_permit"=>"4351", "tmkparcel"=>"19
+", "establishment_address_street"=>{"needs_recoding"=>false, "longitude"=>"-158.03346550063853", "lat
+itude"=>"21.678410139474995", "human_address"=>"{\"address\":\"KAMEHAMEHA HIGHWAY\",\"city\":\"HALEIW
+A\",\"state\":\"HAWAII\",\"zip\":\"96712\"}"}, "permit_holder"=>"HALEIWA L & L, INC.", "st_inspection
+"=>"2010-09-14T00:00:00", "mailing_address_street_name"=>"KAMEHAMEHA HIGHWAY ", "mailing_address_stre
+et"=>{"needs_recoding"=>false, "longitude"=>"-158.03346550063853", "latitude"=>"21.678410139474995",
+"human_address"=>"{\"address\":\"KAMEHAMEHA HIGHWAY\",\"city\":\"HALEIWA\",\"state\":\"HAWAII\",\"zip
+\":\"96712\"}"}, "business_status"=>"Open", "establishment_address_city"=>"HALEIWA", "mailing_address
+_state"=>"HAWAII", "establishment_permit"=>"4351", "mailing_address_city"=>"HALEIWA", "tmksection"=>"
+6", "mailing_address_unit"=>"   ", "establishment"=>"L & L DRIVE INN #11", "facility_type"=>"137 New
+and Renewal 1", "permit_expire_date"=>"2012-09-29T00:00:00", "mailing_address_zip_code"=>"96712", "tm
+kplat"=>"9", "establishment_address_zip_code"=>"96712", "risk_category"=>"Category 1", "establishment
+_address_state"=>"HAWAII", "telephone"=>"(808)637-4700", "establishment_address_street_name"=>"KAMEHA
+MEHA HIGHWAY "}
+
+
+
+
+
+
+
+
+
+
+
+Handle this error!!!
+
+1.9.3-p362 :038 > d_grad_rates = c.data_for "m5pw-2ea9"
+81) Name: /Economic-Development/Table-13-06-TOTAL-AND-PER-CAPITA-PERSONAL-INCOME-F  ID: 5gja-rp2f           │using app_token: 2OLe08n1PW60Fwferxi5OlEIF
+82) Name: /Economic-Development/Table-14-02-CONSUMER-PRICE-INDEX-FOR-ALL-URBAN-CON  ID: 4qc6-bjzm           │response:
+83) Name: /Economic-Development/Table-17-03-CONSUMPTION-OF-ENERGY-BY-END-USE-SECTO  ID: usfi-mive           │{:body=>"{\n  \"code\" : \"dataset.missing\",\n  \"error\" : true,\n  \"message\" : \"Not found\",\n
+84) Name: /Economic-Development/Table-17-05-PRIMARY-ENERGY-CONSUMPTION-BY-SOURCE-1  ID: 7rq6-y7pf           │ \"data\" : {\n    \"id\" : \"m5pw-2ea9\"\n  }\n}\n", :code=>"404"}
+85) Name: /Economic-Development/Table-18-07-MOTOR-VEHICLES-REGISTERED-BY-COUNTY-19  ID: jbez-8d6q           │RuntimeError: Error querying "http://data.hawaii.gov/resource/m5pw-2ea9.json": {
+86) Name: /Economic-Development/Table-3-14-HAWAII-STATE-HIGH-SCHOOL-GRADUATES-BY-P  ID: bvnw-4za7           │  "code" : "dataset.missing",
+87) Name: /Economic-Development/Table-3-22-HEADCOUNT-ENROLLMENT-AT-THE-UNIVERSITY-  ID: rjsa-twkk           │  "error" : true,
+88) Name: /Economic-Development/Table-7-03-VISITOR-ARRIVALS-AND-AVERAGE-DAILY-VISI  ID: b587-guv7           │  "message" : "Not found",
+89) Name: /Economic-Development/Table-9-51-FEDERAL-EXPENDITURES-IN-HAWAII-BY-TYPE-  ID: hb24-hmx9           │  "data" : {
+90) Name: /Economic-Development/WTI-Barrel-of-Oil-Future-Prices  ID: jzyk-q3tp                              │    "id" : "m5pw-2ea9"
+91) Name: /Education/Achievement-Results-for-State-Assessments-in-Mathe  ID: r3ix-z65i                      │  }
+92) Name: /Education/Achievement-Results-for-State-Assessments-in-Mathe  ID: jie4-w22m                      │}
+93) Name: /Education/Achievement-Results-for-State-Assessments-in-Mathe  ID: hhtw-4eb7                      │
+94) Name: /Education/Achievement-Results-for-State-Assessments-in-Readi  ID: s5rp-twp9                      │        from client.rb:93:in `get!'
+95) Name: /Education/Achievement-Results-for-State-Assessments-in-Readi  ID: mvz4-m3zh                      │        from client.rb:101:in `get'
+96) Name: /Education/Achievement-Results-for-State-Assessments-in-Readi  ID: 6qru-yfc5                      │        from client.rb:105:in `get_json'
+97) Name: /Education/Adjusted-Cohort-Graduation-Rates-at-the-school-lev  ID: m5pw-2ea9                      │        from client.rb:157:in `data_for'
+98) Name: /Education/Early-Learning  ID: tnnx-zerc                                                          │        from (irb):38
+99) Name: /Education/Investing-In-Innovation-2010-Applications  ID: qk9j-ipa4                               │        from /Users/koba/.rvm/rubies/ruby-1.9.3-p362/bin/irb:16:in `<main>'
