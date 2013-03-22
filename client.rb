@@ -49,7 +49,7 @@ module HGovData
 
     def cache_name_for url
       url.gsub(/http[s]?:\/\//, "")
-        .gsub(/[;,\/&]/, "_")
+        .gsub(/[;,\/&$?=]/, "_")
     end
     
     def response_for url
@@ -155,8 +155,10 @@ module HGovData
     # keep_in_mem if you'd like to return all the data as an array.
     # This means it will be kept in memory, so it can be returned.
     def data_for id, opts={}
-      { offset: 0,
-        keep_in_mem: true}.merge!(opts)
+      opts = {
+        offset: 0,
+        keep_in_mem: true
+      }.merge(opts)
       offset   = opts[:offset]
       all_data = opts[:keep_in_mem] ? [] : nil
       
