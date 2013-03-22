@@ -168,17 +168,21 @@ module HGovData
       return @dataset_links unless @dataset_links.nil?
       
       links = Set.new
-      1.upto(100) do |n|
-        puts "Looking for datasets on page #: #{n}"
-        url = "https://#{API_URL}/browse/embed?limitTo=datasets&page=#{n}"
+      page = 0
+      while true do
+        puts "Looking for datasets on page #: #{page}"
+        url = "https://#{API_URL}/browse/embed?limitTo=datasets&page=#{page}"
         puts "url is: #{url}"
         response = response_for url
         break if response[:code] != "200"
+        
         body = response[:body]
         new_links = body.scan(/href="(?:http:\/\/.*?)?(\/[^\/]*?\/[^\/]*?)\/(.{4,4}-.{4,4})"/)
         break if new_links.empty?
+        
         links.merge Set.new(new_links)
         puts "... #{links.size} unique datasets found... (still searching)"
+        page += 1
       end
       puts "Search complete, found #{links.size} datasets."
       @dataset_links = links
