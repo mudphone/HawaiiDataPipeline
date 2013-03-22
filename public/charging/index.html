@@ -53,6 +53,7 @@ function drawMap( hawaii, charging ) {
 
   // Define the projection:
   // Hawaii: 19.5667° N, 155.5000° W
+  // All of Hawaii's Islands:
   // var projection = d3.geo.albers()
   //   .center([0, 18.5])
   //   .rotate([157.50, 0])
@@ -60,7 +61,7 @@ function drawMap( hawaii, charging ) {
   //   .scale(8000)
   //   .translate([width / 2, height / 2]);
 
-  // Oahu-Only
+  // Oahu-Only:
   var projection = d3.geo.albers()
     .center([0, 21.1])
     .rotate([157.9, 0])
