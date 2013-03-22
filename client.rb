@@ -7,7 +7,8 @@ module HGovData
   API_URL = "data.hawaii.gov"
   CLIENT_ENV = "development"
   APP_ROOT = File.expand_path(File.dirname(__FILE__))
-  CACHE_MINUTES = 24 * 60
+  WEEK_IN_MINUTES = 60 * 24 * 7
+  CACHE_MINUTES = WEEK_IN_MINUTES * 4
   CACHE_ROOT = APP_ROOT + "/tmp/cache"
   CONFIG_ROOT = APP_ROOT + "/config"
   
@@ -48,7 +49,7 @@ module HGovData
 
     def cache_name_for url
       url.gsub(/http[s]?:\/\//, "")
-        .gsub(/[;,\/]/, "_")
+        .gsub(/[;,\/&]/, "_")
     end
     
     def response_for url
@@ -83,8 +84,6 @@ module HGovData
     # assumes json, http (not https)
     def get! url
       response = response_for! url
-      puts "response:"
-      puts response
       # Check our response code
       if response && response[:code] != "200"
         raise "Error querying \"#{url.to_s}\": #{response[:body]}"
@@ -150,8 +149,19 @@ module HGovData
       nil
     end
 
+    # Paging supported, see docs here:
+    # http://dev.socrata.com/docs/queries
     def data_for id
-      get_json "http://#{API_URL}/resource/#{id}.json"
+      offset = 0
+      all_data = []
+      while true do
+        d = get_json "http://#{API_URL}/resource/#{id}.json?$limit=1000&$offset=#{offset}"
+        all_data += d
+        break if d.size < 1000
+        offset += 1
+      end
+
+      all_data
     end
 
     def datasets
