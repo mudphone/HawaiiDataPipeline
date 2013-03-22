@@ -151,18 +151,32 @@ module HGovData
 
     # Paging supported, see docs here:
     # http://dev.socrata.com/docs/queries
-    def data_for id
-      offset = 0
-      all_data = []
+    #
+    # keep_in_mem if you'd like to return all the data as an array.
+    # This means it will be kept in memory, so it can be returned.
+    def data_for id, opts={}
+      { offset: 0,
+        keep_in_mem: true}.merge!(opts)
+      offset   = opts[:offset]
+      all_data = opts[:keep_in_mem] ? [] : nil
+      
       while true do
         d = get_json "http://#{API_URL}/resource/#{id}.json?$limit=1000&$offset=#{offset}"
-        all_data += d
+        all_data += d if opts[:keep_in_mem]
         break if d.size < 1000
         offset += 1
       end
 
       all_data
     end
+
+    # Retrieve all the data from an API end-point, but just throw it
+    # into cache files.  It is not accumulated in memory.
+    def run_data_for id, opts={}
+      opts.merge!({ keep_in_mem: false }) # override!
+      data_for id, opts
+    end
+
 
     def datasets
       return @dataset_links unless @dataset_links.nil?
