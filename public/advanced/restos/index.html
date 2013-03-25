@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="js/underscore-min.js"></script>
+<script src="js/d3.v3.0.8.min.js"></script>
+<script src="js/queue.v1.min.js"></script>
+<script src="js/topojson.v0.min.js"></script>
+<style>
+
+.resto {
+  fill: green;
+}
+
+.state {
+  fill: steelblue;
+}
+
+.place,
+.place-label {
+  fill: #444;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+
+</style>
+</head>
+<body>
+<script>
+
+var width = 960,
+    height = 1160;
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// queue()
+//     .defer(d3.json, "data/hawaii_topojson.json")
+//     .defer(d3.json, "data/charging.json")
+//     .await(ready);
+
+// function ready( error, hawaii, charging ) {
+//   drawMap( hawaii, charging );
+// }
+
+var circles;
+var fadeInDuration = 4000;
+var fadeOutDuration = 3000;
+
+function clearDataset( index, mapProjection ) {
+  console.log('clearDataset: index: ' + index);
+  circles
+    .data([])
+    .exit()
+    .transition()
+      .delay( function(d,i) { return Math.random() * 1000 } )
+      .duration( fadeOutDuration )
+      .attr("r", 50)
+      .attr("opacity", 0.0)
+      .style("fill", "white")
+      .remove();
+
+  setTimeout(function() {
+    loadDataset( index+1, mapProjection );
+  }, fadeOutDuration + 500 );
+}
+
+function loadDataset( index, mapProjection ) {
+  d3.json("data/restos_" + index + ".json", function(error, data) {
+    if (_.isNull(data) || _.isUndefined(data) || _.isEmpty(data)) return;
+
+    console.log('loadDataset: ' + index);
+    // Object {establishment_address_unit: "   ", tmkzone: "2", facility_permit: "102", tmkparcel: "5", establishment_address_street: Object…}
+    // business_status: "Open"
+    // establishment: "MANOA ELEMENTARY SCHOOL"
+    // establishment_address_city: "HONOLULU"
+    // establishment_address_state: "HAWAII"
+    // establishment_address_street: Object
+    // human_address: "{"address":"MANOA ROAD","city":"HONOLULU","state":"HAWAII","zip":"96822"}"
+    // latitude: "21.306465755996015"
+    // longitude: "-157.82423721961982"
+    // needs_recoding: false
+    // __proto__: Object
+    // establishment_address_street_name: "MANOA ROAD "
+    // establishment_address_unit: "   "
+    // establishment_address_zip_code: "96822"
+    // establishment_permit: "102"
+    // facility_permit: "102"
+    // facility_type: "137 New and Renewal 1"
+    // mailing_address_city: "HONOLULU"
+    // mailing_address_state: "HAWAII"
+    // mailing_address_street: Object
+    // human_address: "{"address":"MANOA ROAD","city":"HONOLULU","state":"HAWAII","zip":"96822"}"
+    // latitude: "21.306465755996015"
+    // longitude: "-157.82423721961982"
+    // needs_recoding: false
+    // __proto__: Object
+    // mailing_address_street_name: "MANOA ROAD "
+    // mailing_address_unit: "   "
+    // mailing_address_zip_code: "96822"
+    // mailing_care_of: " FOOD SERVICE MANAGER"
+    // permit_expire_date: "2013-05-12T00:00:00"
+    // permit_holder: "DEPARTMENT OF EDUCATION"
+    // risk_category: "Category 1"
+    // st_inspection: "2011-05-04T00:00:00"
+    // telephone: "(808)988-1866"
+    // tmkparcel: "5"
+    // tmkplat: "36"
+    // tmksection: "9"
+    // tmkzone: "2"
+    // __proto__: Object
+
+    // Add restaurants stations:
+    var transitionDuration = 250000;
+    circles = svg.selectAll("circle.resto")
+      .data(data, function(d, i) {
+        // var establishmentLoc = d.establishment_address_street;
+        // return [establishmentLoc.longitude, establishmentLoc.latitude];
+        return index * 2000 + i;
+      });
+
+    circles.enter()
+      .append("circle")
+        .attr("class", "resto")
+        .attr("cx", function(d) {
+          return mapProjection( [
+            d.establishment_address_street.longitude, 
+            d.establishment_address_street.latitude] )[0];
+        })
+        .attr("cy", function(d) {
+          return mapProjection( [ 
+            d.establishment_address_street.longitude, 
+            d.establishment_address_street.latitude] )[1];
+        })
+        .attr("r", 50)
+        .attr("opacity", 0.0)
+      .transition()
+        // .delay( function(d, i) { return i/data.length * transitionDuration; })
+        // .duration( function(d, i) { return transitionDuration/data.length; } )
+        .delay( function(d,i) { return Math.random() * 1000 } )
+        .duration( fadeInDuration )
+        .attr("r", 3)
+        .attr("opacity", 0.25);
+    
+    if (index >= 10) return;
+    setTimeout(function() {
+      // loadDataset(index+1, mapProjection);
+      clearDataset(index, mapProjection);
+    }, fadeInDuration + 500);
+  });
+}
+
+// d3.json("data/hawaii_topojson.json", function(error, hawaii) {
+// function drawMap( hawaii, charging ) {
+d3.json("data/hawaii_topojson.json", function(error, hawaii) {
+  // Convert back to GeoJSON:
+  var subunits = topojson.object(hawaii, hawaii.objects.subunits);
+
+  // Define the projection:
+  // Hawaii: 19.5667° N, 155.5000° W
+  // All of Hawaii's Islands:
+  // var projection = d3.geo.albers()
+  //   .center([0, 18.5])
+  //   .rotate([157.50, 0])
+  //   .parallels([15, 25])
+  //   .scale(8000)
+  //   .translate([width / 2, height / 2]);
+
+  // Oahu-Only:
+  var projection = d3.geo.albers()
+    .center([0, 21.1])
+    .rotate([157.9, 0])
+    .parallels([15, 25])
+    .scale(50000)
+    .translate([width / 2, height / 2]);
+
+  // Define path generator:
+  var path = d3.geo.path()
+    .projection(projection)
+    .pointRadius(2);
+
+  // Add state path:
+  svg.append("path")
+    .datum(subunits)
+    .attr("class", "state")
+    .attr("d", path);
+
+  // Add places
+  svg.append("path")
+    .datum(topojson.object(hawaii, hawaii.objects.places))
+    .attr("d", path)
+    .attr("class", "place");
+
+  // Add place labels:
+  svg.selectAll(".place-label")
+      .data(topojson.object(hawaii, hawaii.objects.places).geometries)
+    .enter().append("text")
+      .attr("class", "place-label")
+      .attr("transform", function(d) {
+        return "translate(" + projection(d.coordinates) + ")"; })
+      .attr("dy", ".35em")
+      .text(function(d) { return d.properties.name; });
+
+  // Align labels depending on what side of map they're on:
+  var leftPointingCityLabels = ['Wahiawa', 'Kailua-Kona'];
+  svg.selectAll(".place-label")
+    .attr("x", function(d) {
+      var offset = 6;
+      return _.contains(leftPointingCityLabels, d.properties.name) ? -offset : offset;
+    })
+    .style("text-anchor", function(d) {
+      return _.contains(leftPointingCityLabels, d.properties.name) ? "end" : "start";
+    });
+
+  loadDataset(1, projection);
+});
+
+</script>
+</body>
+</html>
