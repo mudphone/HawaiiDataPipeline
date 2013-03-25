@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 <script src="js/underscore-min.js"></script>
 <script src="js/d3.v3.0.8.min.js"></script>
+<script src="js/queue.v1.min.js"></script>
 <style>
 
 body {
@@ -127,10 +128,8 @@ function visualizeData( data ) {
 }
 
 // Combine both death and birth datasets into a single dataset.
-d3.json("data/death_xa5e-sayp.json", function(error, deathData) {
-  d3.json("data/birth_padw-q7ep.json", function(error, birthData) {
-
-    var mergedData = [];
+function ready( error, deathData, birthData ) {
+      var mergedData = [];
     _.each(deathData, function(deathRec){
       var year = deathRec.year;
       var births = 0;
@@ -149,9 +148,13 @@ d3.json("data/death_xa5e-sayp.json", function(error, deathData) {
 
     // Feed unified dataset into visualization:
     visualizeData(mergedData);
+}
 
-  });
-});
+queue()
+  .defer(d3.json, "data/death_xa5e-sayp.json")
+  .defer(d3.json, "data/birth_padw-q7ep.json")
+  .await(ready);
+
 
 </script>
 </body>
