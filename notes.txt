@@ -1,3 +1,25 @@
+# Name of this thing?
+hawaii data gov api
+open data
+bootstrap
+
+
+Hawaii Data Pipeline
+
+
+# Install
+Ruby Virtual Box - Virtual Box, Vagrant, Rails Dev Box
+Several install methods: http://www.ruby-lang.org/en/downloads/
+Ruby on Windows: http://rubyinstaller.org
+On Mac, it has it already in /usr/bin/ruby... but, suggest Homebrew
+method (brew install ruby)
+What's the best way to install ruby?
+
+RVM
+Create Gemfile http://ruby.about.com/od/bundler/ss/Getting-Started-With-Bundler.htm
+Bundler
+
+
 $ irb
 $ load 'client.rb' # will reload if already loaded, which is good for debugging
 $ c = HGovData::Client.new(app_token: "YOUR_CLIENT_TOKEN")

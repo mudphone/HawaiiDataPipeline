@@ -21,6 +21,10 @@ var svg = d3.select("body").append("svg")
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+var blueScale = d3.scale.linear()
+    .domain([0, height])
+    .range(["#283244", "#CF4FE3"]);
+
 // This is where the action is.
 // Loads the json data file after pulling it from the server.
 // Exposes it to you as as JS objects as the "data" array.
@@ -50,6 +54,9 @@ d3.json("data/death_xa5e-sayp.json", function(error, data) {
     .transition()
       .delay(function(d, i) { return i / data.length * 10000; })
       .duration( 10000 / data.length )
+      .style("fill", function(d) { 
+        return blueScale(height - y(d.rate_per_1000_resident_population));
+      })
       .attr("y", function(d) { 
         return y(d.rate_per_1000_resident_population);
       })
