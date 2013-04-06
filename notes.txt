@@ -1,13 +1,13 @@
 # Name of this thing?
-hawaii data gov api
-open data
-bootstrap
-
-
 Hawaii Data Pipeline
 
+RVM
+Create Gemfile 
+  http://ruby.about.com/od/bundler/ss/Getting-Started-With-Bundler.htm
+Bundler
 
-# Install
+
+# Install Instructions
 Ruby Virtual Box - Virtual Box, Vagrant, Rails Dev Box
 Several install methods: http://www.ruby-lang.org/en/downloads/
 Ruby on Windows: http://rubyinstaller.org
@@ -15,24 +15,13 @@ On Mac, it has it already in /usr/bin/ruby... but, suggest Homebrew
 method (brew install ruby)
 What's the best way to install ruby?
 
-RVM
-Create Gemfile http://ruby.about.com/od/bundler/ss/Getting-Started-With-Bundler.htm
-Bundler
 
 
-$ irb
-$ load 'client.rb' # will reload if already loaded, which is good for debugging
-$ c = HGovData::Client.new(app_token: "YOUR_CLIENT_TOKEN")
-$ v = c.views
-$ c.list_views  # list all datasets (names of all views)
-$ d = c.data_for v[0]['id']
 
+$ irb -r './client.rb'
+> c = HGovData::Client.new  # if you have set up your config/config.yml file
+> c = HGovData::Client.new(app_token: "YOUR_CLIENT_TOKEN")
 
-Current dataset listing (as of 2013/3/8):
-https://gist.github.com/mudphone/5123035
-
-
-# $:.unshift File.dirname(__FILE__)
 
 
 $stdout = File.new( '/tmp/output', 'w' )
@@ -40,13 +29,21 @@ To restore:
 $stdout = STDOUT
 
 
+# dataset listing
+> c.list_datasets
+
 
 # let's look at the death and birth rates in Hawaii
-$ irb
-> load 'client.rb'
-> c = HGovData::Client.new
-> d_death = c.data_for "xa5e-sayp"
 > d_birth = c.data_for "padw-q7ep"
+> d_death = c.data_for "xa5e-sayp"
+
+
+
+$ mkdir -p public/list/data
+$ cd tmp/cache
+$ cp data.hawaii.gov_resource_padw-q7ep.json__limit_1000__offset_0.cache ../../public/list/data/birth.json
+
+
 
 # let's check out the sample D3 bar graphs:
 $ cd public

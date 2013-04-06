@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby -w
 require 'net/https'
+require 'fileutils'
 require 'json'
 require 'set'
+require 'yaml'
 
-module HGovData
+module HDPipeline
   API_URL = "data.hawaii.gov"
   CLIENT_ENV = "development"
   APP_ROOT = File.expand_path(File.dirname(__FILE__))
@@ -27,6 +29,7 @@ module HGovData
       @config[:app_token] = opts[:app_token]
       @config[:app_token] ||= @user_config[:socrata] ? @user_config[:socrata][:app_token] : nil
       @config[:app_token] ||= "K6rLY8NBK0Hgm8QQybFmwIUQw"
+      FileUtils.mkdir_p CACHE_ROOT
     end
 
     def response_for! url
