@@ -1,0 +1,1 @@
+This project has moved to [PasDeChocolat/HawaiiDataPipeline](https://github.com/PasDeChocolat/HawaiiDataPipeline).
